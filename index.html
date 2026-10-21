@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>किसान AI ग्राम-साथी | आधुनिक व जैविक कृषि मंच</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA & Mobile Web Capabilities -->
+    <meta name="theme-color" content="#14532d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        body { -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, sans-serif; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .pulse-offline { animation: pulseGlow 2s infinite; }
+        @keyframes pulseGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-900 pb-20 select-none">
+
+    <!-- Top Sticky Header -->
+    <header class="sticky top-0 z-50 bg-green-900 text-white shadow-md">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-400 text-green-950 flex items-center justify-center font-black text-xl shadow">
+                    <i class="fa-solid fa-seedling"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base md:text-lg leading-tight">किसान AI ग्राम-साथी</h1>
+                    <p class="text-[11px] text-green-200">theorganicfarminglove@gmail.com</p>
+                </div>
+            </div>
+
+            <!-- Dynamic Network Indicator -->
+            <div id="netStatusBadge" class="flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 border border-emerald-400 shadow">
+                <span id="netStatusDot" class="w-2.5 h-2.5 rounded-full bg-lime-300"></span>
+                <span id="netStatusText">ऑनलाइन AI</span>
+            </div>
+        </div>
+
+        <!-- Offline Banner -->
+        <div id="offlineNotice" class="hidden bg-amber-600 text-stone-100 text-xs px-4 py-1.5 text-center flex items-center justify-center space-x-2 font-medium">
+            <i class="fa-solid fa-tower-broadcast"></i>
+            <span>गांव मोड सक्रिय: बिना नेटवर्क के ऑफलाइन AI इंजन और डेटाबेस चालू है।</span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto p-3 md:p-6 space-y-5">
+
+        <!-- 1. Voice AI & Instant Doctor Banner -->
+        <div class="bg-gradient-to-r from-emerald-800 via-green-800 to-teal-900 rounded-3xl p-5 text-white shadow-xl relative overflow-hidden">
+            <div class="relative z-10 space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <span class="bg-yellow-400/20 text-yellow-300 text-xs font-bold px-3 py-1 rounded-full border border-yellow-300/30 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-robot"></i>
+                        <span>स्मार्ट कृषि AI सलाहकार (ऑनलाइन/ऑफलाइन)</span>
+                    </span>
+                    <span class="text-[11px] text-green-200">100% जैविक व प्राकृतिक समाधान</span>
+                </div>
+
+                <h2 class="text-xl md:text-2xl font-black">अपनी फसल, मिट्टी या बीमारी के बारे में पूछें</h2>
+                <p class="text-xs text-green-100 max-w-xl">
+                    केसर, मशरूम, चंदन, ड्रैगन फ्रूट से लेकर गेहूं, सरसों, कपास तक किसी भी फसल की मिट्टी, कीट व जैविक इलाज तुरंत जानें।
+                </p>
+
+                <!-- Search / Query Input -->
+                <div class="flex flex-col sm:flex-row gap-2 pt-1">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-stone-400 text-sm"></i>
+                        <input type="text" id="aiInput" placeholder="जैसे: 'केसर की खेती', 'दीमक का इलाज', 'काली मिट्टी की फसलें'..." 
+                               class="w-full pl-10 pr-4 py-2.5 bg-white text-stone-900 rounded-2xl text-xs md:text-sm font-medium outline-none focus:ring-2 focus:ring-yellow-400 shadow-inner">
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="runSmartAI()" class="bg-yellow-400 hover:bg-yellow-300 text-stone-900 px-5 py-2.5 rounded-2xl font-bold text-xs md:text-sm flex items-center justify-center space-x-1.5 shadow active:scale-95 transition">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>AI उत्तर</span>
+                        </button>
+                        <button id="voiceBtn" onclick="toggleVoiceAI()" class="bg-stone-800 hover:bg-stone-700 text-white px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center justify-center space-x-1 border border-white/20 active:scale-95 transition">
+                            <i id="voiceMicIcon" class="fa-solid fa-microphone text-rose-400"></i>
+                            <span id="voiceBtnText">माइक</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <i class="fa-solid fa-wheat-awn absolute -right-6 -bottom-6 text-9xl text-white/5 pointer-events-none"></i>
+        </div>
+
+        <!-- AI Diagnostic Response Card -->
+        <div id="aiResponseCard" class="hidden bg-white rounded-3xl p-5 shadow-lg border border-emerald-200 transition-all">
+            <div class="flex justify-between items-start border-b border-stone-100 pb-3 mb-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-green-100 text-green-800 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-stone-800 text-sm md:text-base" id="aiResTitle">AI समाधान रिपोर्ट</h3>
+                        <span class="text-[10px] text-stone-400" id="aiResSource">स्रोत: ग्राम-ज्ञानकोश</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="readAloudAI()" class="text-xs bg-green-50 text-green-700 px-2.5 py-1 rounded-lg border border-green-200 font-semibold flex items-center space-x-1">
+                        <i class="fa-solid fa-volume-high"></i>
+                        <span>सुनें</span>
+                    </button>
+                    <button onclick="document.getElementById('aiResponseCard').classList.add('hidden')" class="text-stone-400 hover:text-stone-700 p-1">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="aiResContent" class="text-stone-700 text-xs md:text-sm leading-relaxed whitespace-pre-line space-y-2"></div>
+        </div>
+
+        <!-- 2. Crop Encyclopedia & Multi-Category Directory -->
+        <div class="bg-white rounded-3xl p-4 md:p-6 shadow-sm border border-stone-200 space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div>
+                    <h3 class="font-black text-stone-900 text-base md:text-lg flex items-center space-x-2">
+                        <i class="fa-solid fa-boxes-stacked text-green-700"></i>
+                        <span>भारत की फसलें: सामान्य से उच्च-लागत (High-Cost Exotic) तक</span>
+                    </h3>
+                    <p class="text-xs text-stone-500">लागत, मिट्टी, मौसम और उत्पादन क्षमता अनुसार वर्गीकृत</p>
+                </div>
+                <div class="text-xs font-bold text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200">
+                    कुल प्रदर्शित: <span id="cropCount">0</span> फसलें
+                </div>
+            </div>
+
+            <!-- Categories Horizontal Bar -->
+            <div class="flex items-center space-x-1.5 overflow-x-auto pb-2 custom-scroll text-xs font-bold">
+                <button onclick="filterByCat('all', this)" class="cat-chip active px-3.5 py-2 rounded-xl bg-green-800 text-white shadow-sm whitespace-nowrap">सभी फसलें</button>
+                <button onclick="filterByCat('high_value', this)" class="cat-chip px-3.5 py-2 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 whitespace-nowrap">🌟 अति उच्च-लागत (High Profit)</button>
+                <button onclick="filterByCat('mushroom', this)" class="cat-chip px-3.5 py-2 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 whitespace-nowrap">🍄 मशरूम किस्में</button>
+                <button onclick="filterByCat('spices', this)" class="cat-chip px-3.5 py-2 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 whitespace-nowrap">🌶️ मसाले व औषधीय</button>
+                <button onclick="filterByCat('cash', this)" class="cat-chip px-3.5 py-2 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 whitespace-nowrap">💰 नकदी फसलें</button>
+                <button onclick="filterByCat('cereal', this)" class="cat-chip px-3.5 py-2 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 whitespace-nowrap">🌾 खाद्यान्न व मोटे अनाज</button>
+                <button onclick="filterByCat('horticulture', this)" class="cat-chip px-3.5 py-2 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 whitespace-nowrap">🍎 फल व सब्जियां</button>
+                <button onclick="filterByCat('timber', this)" class="cat-chip px-3.5 py-2 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 whitespace-nowrap">🪵 कीमती लकड़ी (चंदन)</button>
+            </div>
+
+            <!-- Secondary Filters (Soil, Cost, Season) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                <div>
+                    <label class="font-bold text-stone-600 block mb-1">मिट्टी के अनुसार:</label>
+                    <select id="selSoil" onchange="runFilters()" class="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl outline-none font-medium">
+                        <option value="all">सभी प्रकार की मिट्टी</option>
+                        <option value="दोमट">दोमट मिट्टी (Loamy)</option>
+                        <option value="काली">काली मिट्टी (Black Cotton)</option>
+                        <option value="रेतीली">रेतीली / बालू (Sandy)</option>
+                        <option value="लाल">लाल व कंकरीली (Red Soil)</option>
+                        <option value="बिना_मिट्टी">बिना मिट्टी (हाइड्रोपोनिक्स/भूसा)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-bold text-stone-600 block mb-1">लागत श्रेणी (Budget):</label>
+                    <select id="selCost" onchange="runFilters()" class="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl outline-none font-medium">
+                        <option value="all">सभी लागत स्तर</option>
+                        <option value="low">कम लागत (₹5,000 - ₹20,000)</option>
+                        <option value="mid">मध्यम लागत (₹20,000 - ₹80,000)</option>
+                        <option value="high">उच्च लागत (₹1 लाख से ₹15 लाख+)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-bold text-stone-600 block mb-1">मौसम / ऋतु (Season):</label>
+                    <select id="selSeason" onchange="runFilters()" class="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl outline-none font-medium">
+                        <option value="all">सभी मौसम</option>
+                        <option value="खरीफ">खरीफ (मानसून)</option>
+                        <option value="रबी">रबी (सर्दियां)</option>
+                        <option value="जायद">जायद (गर्मी)</option>
+                        <option value="वार्षिक">12 महीने / बहुवर्षीय</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Crop Grid -->
+            <div id="cropCardContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
+                <!-- Rendered dynamically -->
+            </div>
+        </div>
+
+        <!-- 3. Organic Dosage & Formulation Calculator (Acres & Bighas) -->
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200 space-y-3">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-calculator text-green-700 text-lg"></i>
+                <div>
+                    <h3 class="font-bold text-stone-900 text-sm md:text-base">जैविक खाद व कीटनाशक खुराक कैलकुलेटर</h3>
+                    <p class="text-xs text-stone-500">खेत के क्षेत्रफल (एकड़/बीघा) अनुसार सटीक जैविक फॉर्मूला</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                <div>
+                    <label class="font-semibold text-stone-600">जैविक फॉर्मूला चुनें:</label>
+                    <select id="dosageFormula" onchange="recalcDosage()" class="w-full mt-1 p-2 bg-stone-50 border border-stone-300 rounded-xl font-medium outline-none">
+                        <option value="jeevamrit">जीवामृत (खुराक व सूक्ष्मजीव)</option>
+                        <option value="neemastra">नीमास्त्र (रस चूसक कीट नाशक)</option>
+                        <option value="brahmastra">ब्रह्मास्त्र (इल्ली व सुंडी नाशक)</option>
+                        <option value="buttermilk">खट्टी छाछ + हींग (रतुआ व फफूंद नाशक)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-semibold text-stone-600">इकाई (Unit):</label>
+                    <select id="dosageUnit" onchange="recalcDosage()" class="w-full mt-1 p-2 bg-stone-50 border border-stone-300 rounded-xl font-medium outline-none">
+                        <option value="acre">एकड़ (Acre)</option>
+                        <option value="bigha">बीघा (Bigha - 1 एकड़ = 1.6 बीघा)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-semibold text-stone-600">खेत का क्षेत्रफल:</label>
+                    <input type="number" id="dosageArea" value="1" min="0.25" step="0.25" oninput="recalcDosage()" 
+                           class="w-full mt-1 p-2 bg-stone-50 border border-stone-300 rounded-xl font-medium outline-none focus:ring-2 focus:ring-green-600">
+                </div>
+            </div>
+
+            <div id="dosageOutput" class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-stone-800 leading-relaxed font-medium"></div>
+        </div>
+
+        <!-- 4. Offline Email Queue to theorganicfarminglove@gmail.com -->
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200 space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-green-100 text-green-700 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-stone-900 text-sm md:text-base">कृषि वैज्ञानिक सलाह डेस्क (ऑटो-सिंक)</h3>
+                        <p class="text-xs text-stone-500">बिना इंटरनेट के भी सवाल दर्ज करें • नेटवर्क आते ही ईमेल तैयार</p>
+                    </div>
+                </div>
+                <div class="text-[11px] bg-stone-100 px-3 py-1 rounded-full font-bold text-stone-700">
+                    पेंडिंग सवाल: <span id="queueCounter" class="text-rose-600">0</span>
+                </div>
+            </div>
+
+            <div class="p-3 bg-stone-50 border border-stone-200 rounded-2xl text-xs space-y-1">
+                <div class="font-bold text-stone-800">समर्पित ईमेल: <span class="text-green-800 font-mono">theorganicfarminglove@gmail.com</span></div>
+                <p class="text-stone-500 text-[11px]">खेत में इंटरनेट शून्य होने पर भी सवाल फोन में सुरक्षित रहता है। जैसे ही आप नेटवर्क में आएंगे, एक क्लिक में ईमेल सेंड हो जाएगा।</p>
+            </div>
+
+            <form id="agriInquiryForm" onsubmit="handleInquirySubmit(event)" class="space-y-2.5 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input type="text" id="inqName" required placeholder="किसान का नाम व गाँव / जिला" class="p-2.5 bg-stone-50 border border-stone-300 rounded-xl outline-none focus:ring-2 focus:ring-green-600">
+                    <input type="tel" id="inqPhone" required placeholder="मोबाइल नंबर (WhatsApp)" class="p-2.5 bg-stone-50 border border-stone-300 rounded-xl outline-none focus:ring-2 focus:ring-green-600">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input type="text" id="inqCrop" required placeholder="फसल का नाम (उदा: केसर, बटन मशरूम, कपास)" class="p-2.5 bg-stone-50 border border-stone-300 rounded-xl outline-none focus:ring-2 focus:ring-green-600">
+                    <select id="inqSoil" class="p-2.5 bg-stone-50 border border-stone-300 rounded-xl outline-none focus:ring-2 focus:ring-green-600 text-stone-700">
+                        <option value="दोमट">मिट्टी: दोमट</option>
+                        <option value="काली">मिट्टी: काली</option>
+                        <option value="रेतीली">मिट्टी: रेतीली / बालू</option>
+                        <option value="लाल">मिट्टी: लाल / लैटेराइट</option>
+                        <option value="अन्य">मिट्टी: अन्य / अज्ञात</option>
+                    </select>
+                </div>
+                <textarea id="inqMessage" required rows="3" placeholder="रोग के लक्षण, पत्तों की स्थिति या फसल संबंधी समस्या लिखें..." 
+                          class="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl outline-none focus:ring-2 focus:ring-green-600"></textarea>
+
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <button type="submit" class="flex-1 bg-green-800 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl shadow active:scale-95 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>सवाल सेव करें / भेजें</span>
+                    </button>
+                    <button type="button" onclick="syncEmailQueue()" class="bg-amber-500 hover:bg-amber-400 text-stone-900 font-bold px-5 py-2.5 rounded-xl shadow active:scale-95 transition flex items-center justify-center space-x-1.5">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>अभी ईमेल सिंक करें</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Crop Detail Modal -->
+    <div id="cropModal" class="hidden fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-3">
+        <div class="bg-white w-full max-w-2xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="bg-green-900 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span id="modalCropIcon" class="text-2xl">🌱</span>
+                    <div>
+                        <h3 id="modalTitle" class="font-extrabold text-lg leading-tight">फसल विवरण</h3>
+                        <span id="modalSub" class="text-xs text-green-300">श्रेणी</span>
+                    </div>
+                </div>
+                <button onclick="closeCropModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-5 overflow-y-auto space-y-4 custom-scroll text-xs md:text-sm">
+                <!-- 4 Stats Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                    <div class="p-2.5 bg-stone-100 rounded-xl border border-stone-200">
+                        <div class="text-[10px] text-stone-500 font-bold uppercase">मिट्टी</div>
+                        <div id="mSoil" class="font-bold text-stone-800 mt-0.5">-</div>
+                    </div>
+                    <div class="p-2.5 bg-stone-100 rounded-xl border border-stone-200">
+                        <div class="text-[10px] text-stone-500 font-bold uppercase">मौसम/तापमान</div>
+                        <div id="mClimate" class="font-bold text-stone-800 mt-0.5">-</div>
+                    </div>
+                    <div class="p-2.5 bg-stone-100 rounded-xl border border-stone-200">
+                        <div class="text-[10px] text-stone-500 font-bold uppercase">लागत / एकड़</div>
+                        <div id="mCost" class="font-bold text-rose-700 mt-0.5">-</div>
+                    </div>
+                    <div class="p-2.5 bg-stone-100 rounded-xl border border-stone-200">
+                        <div class="text-[10px] text-stone-500 font-bold uppercase">कमाई / एकड़</div>
+                        <div id="mProfit" class="font-bold text-emerald-700 mt-0.5">-</div>
+                    </div>
+                </div>
+
+                <!-- Method -->
+                <div>
+                    <h4 class="font-bold text-stone-900 text-xs uppercase tracking-wider text-green-800 flex items-center space-x-1.5 mb-1.5">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                        <span>खेती की विधि व तकनीक:</span>
+                    </h4>
+                    <p id="mMethod" class="text-stone-700 leading-relaxed bg-stone-50 p-3 rounded-xl border border-stone-200"></p>
+                </div>
+
+                <!-- Problems -->
+                <div>
+                    <h4 class="font-bold text-stone-900 text-xs uppercase tracking-wider text-rose-800 flex items-center space-x-1.5 mb-1.5">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>प्रमुख रोग, कीट व जोखिम:</span>
+                    </h4>
+                    <div id="mProblems" class="text-stone-700 leading-relaxed bg-rose-50/50 p-3 rounded-xl border border-rose-200"></div>
+                </div>
+
+                <!-- Organic Solution -->
+                <div>
+                    <h4 class="font-bold text-stone-900 text-xs uppercase tracking-wider text-emerald-800 flex items-center space-x-1.5 mb-1.5">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>100% जैविक व प्राकृतिक उपचार:</span>
+                    </h4>
+                    <div id="mOrganic" class="text-stone-700 leading-relaxed bg-emerald-50/50 p-3 rounded-xl border border-emerald-200 whitespace-pre-line"></div>
+                </div>
+
+                <div class="pt-2 flex justify-end">
+                    <button onclick="consultThisCrop()" class="bg-green-800 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center space-x-1.5 shadow">
+                        <i class="fa-solid fa-headset"></i>
+                        <span>इस फसल पर विशेषज्ञ से पूछें</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript: Database, Offline Engine, Voice, and Sync -->
+    <script>
+        const EMAIL_TARGET = "theorganicfarminglove@gmail.com";
+
+        // Encyclopedia: Common Crops to High-Value Exotic Crops
+        const CROPS = [
+            // HIGH-VALUE / EXOTIC
+            {
+                id: "saffron",
+                name: "कश्मीरी केसर (Saffron)",
+                scientific: "Crocus sativus",
+                icon: "🌸",
+                category: "high_value",
+                soil: "दोमट / कंकरीली बजरीयुक्त (रेतीली दोमट)",
+                soilKey: "दोमट",
+                climate: "10°C - 20°C (शीत जलवायु / एरोफोनिक्स)",
+                season: "रबी",
+                costTier: "high",
+                costRange: "₹3 लाख - ₹7 लाख / एकड़",
+                profitRange: "₹8 लाख - ₹18 लाख प्रति एकड़",
+                method: "केसर के लिए उत्तम जल निकासी व 6.5-7.5 pH की भुरभुरी मिट्टी चाहिए। आजकल इनडोर वर्टिकल एरोफोनिक्स शेड में भी तापमान और आर्द्रता नियंत्रित कर इसकी सफल खेती की जा रही है।",
+                problems: "कंद सड़न (Corm Rot), फफूंद, चूहों का प्रकोप और जलभराव।",
+                organic: "1. कंद शोधन: बीजामृत या ट्राइकोडर्मा विरिडी (5 ग्राम/लीटर) के घोल में 15 मिनट डुबोएं।\n2. खेत में जलनिकासी पूरी रखें।\n3. नीम की खली 150 किलो/एकड़ खेत तैयारी में डालें।"
+            },
+            {
+                id: "cordyceps",
+                name: "कीड़ाजड़ी / कॉर्डिसेप्स (Cordyceps)",
+                scientific: "Cordyceps militaris",
+                icon: "🐛",
+                category: "high_value",
+                soil: "बिना मिट्टी (ब्राउन राइस मीडियम)",
+                soilKey: "बिना_मिट्टी",
+                climate: "18°C - 22°C (100% कंट्रोल्ड लैब)",
+                season: "वार्षिक",
+                costTier: "high",
+                costRange: "₹2 लाख - ₹5 लाख (लैब सेटअप)",
+                profitRange: "₹1.5 लाख - ₹2.5 लाख प्रति किलो",
+                method: "दुनिया की सबसे महंगी औषधीय फफूंद। इसे स्टरलाइज्ड कांच के जार में भूरे चावल (ब्राउन राइस) पर HEPA फिल्टर और ऑटोमेटिक तापमान-नमी के साथ 65-75 दिनों में उगाया जाता है।",
+                problems: "बैक्टीरियल कंटैमिनेशन, हरी फफूंद (Green Mold), तापमान 24°C पार होने पर विनाश।",
+                organic: "1. 100% स्टरलाइज्ड लैमिनार एयर फ्लो में इनोक्युलेशन।\n2. हाइड्रोजन पेरोक्साइड (3%) व UV-C से कमरे का नियमित शोधन।"
+            },
+            {
+                id: "dragon_fruit",
+                name: "ड्रैगन फ्रूट / कमलम",
+                scientific: "Selenicereus undatus",
+                icon: "🐉",
+                category: "high_value",
+                soil: "रेतीली दोमट / कंकरीली (जलनिकासी अनिवार्य)",
+                soilKey: "रेतीली",
+                climate: "20°C - 38°C (तेज धूप, सूखा रोधी)",
+                season: "वार्षिक",
+                costTier: "high",
+                costRange: "₹3 लाख - ₹4.5 लाख / एकड़ (RCC पोल व ड्रिप)",
+                profitRange: "₹6 लाख - ₹10 लाख / एकड़ (25 साल तक फल)",
+                method: "प्रति एकड़ 500 सीमेंट पोल लगाकर ऊपर रिंग लगाई जाती है। एक पोल पर 4 पौधे चढ़ते हैं। पानी की बहुत कम खपत होती है और पौधा 25 वर्ष तक उत्पादन देता है।",
+                problems: "एंथ्रेक्नोज (तने पर भूरे चकत्ते), फल मक्खी और रूट रॉट।",
+                organic: "1. 5 लीटर खट्टी छाछ और तांबे के तार का अर्क 100 लीटर पानी में मिलाकर स्प्रे करें।\n2. फल मक्खी के लिए मिथाइल यूजेनॉल फेरोमोन ट्रैप लगाएं।"
+            },
+            {
+                id: "sandalwood",
+                name: "सफेद चंदन (White Sandalwood)",
+                scientific: "Santalum album",
+                icon: "🪵",
+                category: "timber",
+                soil: "लाल दोमट / कंकरीली (काली मिट्टी वर्जित)",
+                soilKey: "लाल",
+                climate: "15°C - 40°C (शुष्क व अर्ध-शुष्क)",
+                season: "वार्षिक",
+                costTier: "mid",
+                costRange: "₹80,000 - ₹1.2 लाख / एकड़",
+                profitRange: "₹1.5 करोड़ - ₹2.5 करोड़ / एकड़ (12-15 वर्ष बाद)",
+                method: "चंदन अर्ध-परजीवी पौधा है, इसलिए इसके साथ होस्ट पौधा (कैजुराइना, नीम या अरहर) लगाना आवश्यक है। 12-15 वर्ष में सुगन्धित हार्टवुड तैयार होता है।",
+                problems: "स्पाइक रोग, दीमक और तना छेदक कीट।",
+                organic: "1. दीमक से बचाव हेतु 15 लीटर गोमूत्र + 2 किलो हींग सिंचाई के पानी में बहाएं।\n2. पौधे के तने पर 2 फीट तक नीला थोथा + चूने का लेप लगाएं।"
+            },
+            {
+                id: "vanilla",
+                name: "वेनिला (Vanilla)",
+                scientific: "Vanilla planifolia",
+                icon: "🌿",
+                category: "high_value",
+                soil: "दोमट / जैविक खाद से भरपूर (pH 6.0-7.0)",
+                soilKey: "दोमट",
+                climate: "22°C - 32°C (75-85% नमी / शेडनेट)",
+                season: "वार्षिक",
+                costTier: "high",
+                costRange: "₹2.5 लाख - ₹4 लाख / एकड़",
+                profitRange: "₹10 लाख - ₹15 लाख / एकड़",
+                method: "यह एक आर्किड बेल है जिसे सहारे की जरूरत होती है। इसके फूलों में हाथ से परागण (Hand Pollination) सुबह के समय किया जाता है, तभी फलियां बनती हैं।",
+                problems: "तना गलन, रूट रॉट और एन्थ्रेक्नोज।",
+                organic: "1. ट्राइकोडर्मा हार्जिएनम 10 ग्राम/पौधा वर्मीकम्पोस्ट के साथ दें।\n2. फफूंद से बचाव हेतु दशपर्णी अर्क 3% का छिड़काव करें।"
+            },
+
+            // MUSHROOMS
+            {
+                id: "oyster_mush",
+                name: "ढींगरी / ऑयस्टर मशरूम",
+                scientific: "Pleurotus ostreatus",
+                icon: "🍄",
+                category: "mushroom",
+                soil: "बिना मिट्टी (उबला गेहूं भूसा / पुआल)",
+                soilKey: "बिना_मिट्टी",
+                climate: "20°C - 30°C (80-85% नमी)",
+                season: "वार्षिक",
+                costTier: "low",
+                costRange: "₹5,000 - ₹15,000 (छोटे कमरे हेतु)",
+                profitRange: "₹15,000 - ₹30,000 प्रति चक्र (40-45 दिन)",
+                method: "गर्म पानी में उबले व सूखे भूसे में बीज (स्पॉन) मिलाकर पॉलीथीन में भरें। 15 दिन अंधेरे में रखें। सफेद होने पर थैली हटाकर दिन में 3 बार हल्का पानी स्प्रे करें।",
+                problems: "हरी फफूंद (Trichoderma) और छोटी मक्खियां।",
+                organic: "1. भूसे को 80°C गर्म पानी में 2 घंटे तक शुद्ध करें।\n2. पीले स्टिकी ट्रैप कमरे में लगाएं।"
+            },
+            {
+                id: "button_mush",
+                name: "सफेद बटन मशरूम",
+                scientific: "Agaricus bisporus",
+                icon: "🍄",
+                category: "mushroom",
+                soil: "बिना मिट्टी (सड़ी कंपोस्ट + केसिंग मिट्टी)",
+                soilKey: "बिना_मिट्टी",
+                climate: "15°C - 20°C (सर्दियों में)",
+                season: "रबी",
+                costTier: "mid",
+                costRange: "₹40,000 - ₹80,000 (मौसमी शेड)",
+                profitRange: "₹1 लाख - ₹1.8 लाख प्रति सीजन",
+                method: "28 दिन में तैयार विशेष कंपोस्ट पर बीजाई की जाती है और ऊपर से नारियल पीट/गोबर खाद की 1.5 इंच केसिंग परत चढ़ाई जाती है।",
+                problems: "गीला बुलबुला रोग और फॉर्मेलिन का कुप्रभाव।",
+                organic: "1. केसिंग मिट्टी को भाप से शुद्ध करें।\n2. संक्रमित हिस्से पर तुरंत खाने वाला सूखा नमक या चूना डालें।"
+            },
+
+            // SPICES & MEDICINAL
+            {
+                id: "cumin",
+                name: "जीरा (Cumin)",
+                scientific: "Cuminum cyminum",
+                icon: "🌿",
+                category: "spices",
+                soil: "बलुई दोमट / हल्की दोमट (जलनिकासी अनिवार्य)",
+                soilKey: "दोमट",
+                climate: "15°C - 25°C (शुष्क ठंड)",
+                season: "रबी",
+                costTier: "mid",
+                costRange: "₹18,000 - ₹28,000 / एकड़",
+                profitRange: "₹70,000 - ₹1.4 लाख / एकड़",
+                method: "नवंबर में बुवाई। सिंचाई हल्की और फव्वारे से करें। नमी बढ़ने पर फफूंद का खतरा रहता है।",
+                problems: "छाछिया रोग (Powdery Mildew) और झुलसा (Blight)।",
+                organic: "1. 30-35 दिन पर 5 लीटर खट्टी छाछ + 200 ग्राम घुलनशील गंधक का स्प्रे करें।\n2. ट्राइकोडर्मा 2 किलो/एकड़ खेत तैयारी में दें।"
+            },
+            {
+                id: "ashwagandha",
+                name: "अश्वगंधा (Ashwagandha)",
+                scientific: "Withania somnifera",
+                icon: "🌱",
+                category: "spices",
+                soil: "रेतीली दोमट / कंकरीली (कम पानी वाली भूमि)",
+                soilKey: "रेतीली",
+                climate: "20°C - 35°C (शुष्क मौसम)",
+                season: "खरीफ",
+                costTier: "low",
+                costRange: "₹8,000 - ₹14,000 / एकड़",
+                profitRange: "₹45,000 - ₹75,000 / एकड़",
+                method: "अगस्त में बुवाई। केवल 1-2 सिंचाइयों में तैयार। 150-170 दिन में जड़ें परिपक्व हो जाती हैं।",
+                problems: "जड़ गलन और पत्ती धब्बा।",
+                organic: "1. बीजामृत से बीज शोधन करें।\n2. जीवामृत 200 लीटर प्रति एकड़ सिंचाई के साथ दें।"
+            },
+
+            // COMMON CEREALS & CASH CROPS
+            {
+                id: "wheat",
+                name: "गेहूं (Wheat)",
+                scientific: "Triticum aestivum",
+                icon: "🌾",
+                category: "cereal",
+                soil: "उपजाऊ दोमट व मटियार दोमट",
+                soilKey: "दोमट",
+                climate: "10°C - 22°C (सर्दियां)",
+                season: "रबी",
+                costTier: "low",
+                costRange: "₹12,000 - ₹18,000 / एकड़",
+                profitRange: "₹35,000 - ₹55,000 / एकड़",
+                method: "नवंबर प्रथम पखवाड़े में बुवाई। 4-5 क्रांतिक सिंचाइयां (CRI स्टेज, कल्ले फूटते समय, दाना भरते समय) आवश्यक।",
+                problems: "पीला रतुआ (Yellow Rust), करनाल बंट और चेपा (माहू)।",
+                organic: "1. पीला रतुआ: 5 लीटर खट्टी छाछ + 100 ग्राम हींग 100 लीटर पानी में मिलाकर छिड़कें।\n2. नीमास्त्र 5 लीटर प्रति एकड़ स्प्रे करें।"
+            },
+            {
+                id: "mustard",
+                name: "सरसों / राई (Mustard)",
+                scientific: "Brassica nigra",
+                icon: "🌼",
+                category: "cereal",
+                soil: "रेतीली दोमट से लेकर मध्यम दोमट",
+                soilKey: "रेतीली",
+                climate: "15°C - 25°C",
+                season: "रबी",
+                costTier: "low",
+                costRange: "₹8,000 - ₹12,000 / एकड़",
+                profitRange: "₹30,000 - ₹50,000 / एकड़",
+                method: "अक्टूबर में बुवाई। 2 सिंचाइयों में शानदार पैदावार। पाले से बचाव हेतु खेत की मेड़ों पर धुआं करें।",
+                problems: "चेपा / मोयला (Aphids), सफेद रोली और पाला।",
+                organic: "1. 10 लीटर पानी में 50 मिली नीम तेल + 2 ग्राम साबुन मिलाकर स्प्रे करें।\n2. पाले से बचाव हेतु राख का हल्का बुरकाव करें।"
+            },
+            {
+                id: "cotton",
+                name: "कपास / नरमा (Cotton)",
+                scientific: "Gossypium hirsutum",
+                icon: "☁️",
+                category: "cash",
+                soil: "काली मिट्टी (Black Soil) व गहरी दोमट",
+                soilKey: "काली",
+                climate: "22°C - 35°C (धूप वाला मौसम)",
+                season: "खरीफ",
+                costTier: "mid",
+                costRange: "₹22,000 - ₹32,000 / एकड़",
+                profitRange: "₹50,000 - ₹85,000 / एकड़",
+                method: "मई-जून में बुवाई। कतार से कतार 3-4 फीट दूरी। जलभराव न होने दें।",
+                problems: "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी और मरोड़िया।",
+                organic: "1. 8 फेरोमोन ट्रैप प्रति एकड़ लगाएं।\n2. ब्रह्मास्त्र 3 लीटर प्रति एकड़ 150 लीटर पानी में मिलाकर छिड़कें।"
+            },
+            {
+                id: "strawberry",
+                name: "स्ट्रॉबेरी (Strawberry)",
+                scientific: "Fragaria ananassa",
+                icon: "🍓",
+                category: "horticulture",
+                soil: "हल्की दोमट / बलुई दोमट (pH 5.5-6.5)",
+                soilKey: "दोमट",
+                climate: "15°C - 25°C (हल्की धूप व शीत)",
+                season: "रबी",
+                costTier: "high",
+                costRange: "₹1.5 लाख - ₹2.5 लाख / एकड़",
+                profitRange: "₹4 लाख - ₹7 लाख / एकड़ (4 माह में)",
+                method: "उठी हुई क्यारियों (Beds) पर प्लास्टिक मल्चिंग और ड्रिप सिस्टम से रोपाई। दिसंबर से मार्च तक तुड़ाई।",
+                problems: "लीफ स्पॉट, पाउडरी मिल्ड्यू और फल सड़न।",
+                organic: "1. ट्राइकोडर्मा की ड्रेंचिंग जड़ों में करें।\n2. फल को मिट्टी से बचाने के लिए पुआल की बिछावन (Mulch) रखें।"
+            }
+        ];
+
+        let selectedCat = 'all';
+
+        // Render Crop Cards
+        function renderCrops(list) {
+            const container = document.getElementById('cropCardContainer');
+            document.getElementById('cropCount').innerText = list.length;
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-10 text-center text-stone-500">
+                        <i class="fa-solid fa-seedling text-4xl mb-2 text-amber-500"></i>
+                        <p class="font-bold text-sm">इस फिल्टर में कोई फसल नहीं मिली।</p>
+                        <p class="text-xs">कृपया अन्य मिट्टी प्रकार या 'सभी फसलें' चुनकर देखें।</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = list.map(c => `
+                <div onclick="openCropDetails('${c.id}')" class="bg-stone-50 hover:bg-white p-4 rounded-2xl border border-stone-200 hover:border-green-600 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-start justify-between">
+                            <span class="text-3xl">${c.icon}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${c.costTier === 'high' ? 'bg-amber-100 text-amber-800 border border-amber-300' : (c.costTier === 'mid' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800')}">
+                                ${c.costTier === 'high' ? '🌟 हाई-लागत/मुनाफा' : (c.costTier === 'mid' ? 'मध्यम लागत' : 'कम लागत')}
+                            </span>
+                        </div>
+                        <h4 class="font-bold text-stone-900 text-sm mt-2 group-hover:text-green-800 transition">${c.name}</h4>
+                        <p class="text-[11px] text-stone-400 italic">${c.scientific}</p>
+
+                        <div class="mt-3 space-y-1 text-[11px] text-stone-600">
+                            <div class="flex items-center space-x-1.5">
+                                <i class="fa-solid fa-mountain text-stone-400 w-3"></i>
+                                <span><strong>मिट्टी:</strong> ${c.soilKey}</span>
+                            </div>
+                            <div class="flex items-center space-x-1.5">
+                                <i class="fa-solid fa-cloud-sun text-stone-400 w-3"></i>
+                                <span><strong>मौसम:</strong> ${c.season}</span>
+                            </div>
+                            <div class="flex items-center space-x-1.5 text-emerald-700 font-semibold">
+                                <i class="fa-solid fa-chart-line text-emerald-600 w-3"></i>
+                                <span>कमाई: ${c.profitRange.split('/')[0]}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 pt-2.5 border-t border-stone-200 flex items-center justify-between text-xs font-bold text-green-700">
+                        <span>पूर्ण गाइड व रोग</span>
+                        <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filters
+        function filterByCat(cat, btn) {
+            selectedCat = cat;
+            document.querySelectorAll('.cat-chip').forEach(b => {
+                b.className = "cat-chip px-3.5 py-2 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 whitespace-nowrap";
+            });
+            btn.className = "cat-chip active px-3.5 py-2 rounded-xl bg-green-800 text-white shadow-sm whitespace-nowrap";
+            runFilters();
+        }
+
+        function runFilters() {
+            const soil = document.getElementById('selSoil').value;
+            const cost = document.getElementById('selCost').value;
+            const season = document.getElementById('selSeason').value;
+
+            const filtered = CROPS.filter(c => {
+                const mCat = (selectedCat === 'all') || (c.category === selectedCat);
+                const mSoil = (soil === 'all') || (c.soilKey.includes(soil));
+                const mCost = (cost === 'all') || (c.costTier === cost);
+                const mSeason = (season === 'all') || (c.season.includes(season));
+                return mCat && mSoil && mCost && mSeason;
+            });
+
+            renderCrops(filtered);
+        }
+
+        // Modal
+        function openCropDetails(id) {
+            const crop = CROPS.find(c => c.id === id);
+            if (!crop) return;
+
+            document.getElementById('modalCropIcon').innerText = crop.icon;
+            document.getElementById('modalTitle').innerText = `${crop.name} (${crop.scientific})`;
+            document.getElementById('modalSub').innerText = `श्रेणी: ${crop.category} • ऋतु: ${crop.season}`;
+            document.getElementById('mSoil').innerText = crop.soil;
+            document.getElementById('mClimate').innerText = crop.climate;
+            document.getElementById('mCost').innerText = crop.costRange;
+            document.getElementById('mProfit').innerText = crop.profitRange;
+            document.getElementById('mMethod').innerText = crop.method;
+            document.getElementById('mProblems').innerText = crop.problems;
+            document.getElementById('mOrganic').innerText = crop.organic;
+
+            document.getElementById('cropModal').classList.remove('hidden');
+        }
+
+        function closeCropModal() {
+            document.getElementById('cropModal').classList.add('hidden');
+        }
+
+        function consultThisCrop() {
+            const title = document.getElementById('modalTitle').innerText;
+            closeCropModal();
+            document.getElementById('inqCrop').value = title.split('(')[0].trim();
+            document.getElementById('agriInquiryForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Smart AI Heuristic
+        function runSmartAI() {
+            const query = document.getElementById('aiInput').value.trim().toLowerCase();
+            if (!query) {
+                alert("कृपया पहले अपनी फसल, मिट्टी या रोग का नाम लिखें!");
+                return;
+            }
+
+            const card = document.getElementById('aiResponseCard');
+            const title = document.getElementById('aiResTitle');
+            const body = document.getElementById('aiResContent');
+            const source = document.getElementById('aiResSource');
+
+            card.classList.remove('hidden');
+            title.innerText = `AI विश्लेषण: "${query}"`;
+            source.innerText = navigator.onLine ? "स्रोत: हाइब्रिड ऑनलाइन + लोकल AI" : "स्रोत: 100% ऑफलाइन ग्राम-ज्ञानकोश";
+
+            let match = CROPS.find(c => query.includes(c.name.toLowerCase()) || query.includes(c.id) || c.name.toLowerCase().includes(query));
+
+            if (match) {
+                body.innerHTML = `
+                    <div class="p-3 bg-green-50 rounded-xl border border-green-200">
+                        <strong>🌾 फसल पहचान: ${match.name}</strong><br>
+                        <strong>अनुकूल मिट्टी:</strong> ${match.soil}<br>
+                        <strong>लागत व कमाई:</strong> लागत ${match.costRange} | कमाई ${match.profitRange}
+                    </div>
+                    <div class="mt-2">
+                        <strong class="text-rose-700">⚠️ मुख्य रोग व समस्याएं:</strong><br>
+                        ${match.problems}
+                    </div>
+                    <div class="mt-2">
+                        <strong class="text-emerald-700">🌱 100% जैविक समाधान:</strong><br>
+                        ${match.organic}
+                    </div>
+                `;
+                return;
+            }
+
+            if (query.includes('दीमक') || query.includes('termite')) {
+                body.innerHTML = `
+                    <strong>दीमक व जमीन के कीड़ों का जैविक उपचार:</strong><br>
+                    1. 10 लीटर गोमूत्र + 2 किलो पिसी हींग को 200 लीटर पानी में मिलाकर सिंचाई के साथ खेत में बहाएं।<br>
+                    2. बुवाई के समय 100 किलो प्रति एकड़ नीम की खली डालें।
+                `;
+            } else if (query.includes('काली मिट्टी') || query.includes('black soil')) {
+                body.innerHTML = `
+                    <strong>काली मिट्टी (Black Cotton Soil) के लिए फसलें:</strong><br>
+                    • नकदी फसल: कपास, गन्ना, सोयाबीन<br>
+                    • अनाज: गेहूं, चना, ज्वार, अलसी<br>
+                    <strong>सलाह:</strong> जलभराव से बचें और खेत में जलनिकासी के नाले बनाएं।
+                `;
+            } else if (query.includes('रेतीली') || query.includes('sandy')) {
+                body.innerHTML = `
+                    <strong>रेतीली व बलुई मिट्टी के लिए फसलें:</strong><br>
+                    • उच्च मुनाफा: ड्रैगन फ्रूट, अनार, बेर, अंजीर, अश्वगंधा<br>
+                    • पारंपरिक: बाजरा, ग्वार, मूंगफली, मोठ, तरबूज<br>
+                    <strong>सलाह:</strong> ड्रिप सिंचाई व जीवामृत का नियमित प्रयोग करें।
+                `;
+            } else {
+                body.innerHTML = `
+                    <strong>सामान्य कृषि AI परामर्श:</strong><br>
+                    • यदि पत्तों पर पीलापन या फफूंद दिखे, तो 5 लीटर खट्टी छाछ + 100 ग्राम हींग 100 लीटर पानी में मिलाकर स्प्रे करें।<br>
+                    • विस्तृत सलाह के लिए नीचे दिए फॉर्म से <strong>${EMAIL_TARGET}</strong> पर सवाल भेजें।
+                `;
+            }
+        }
+
+        // Voice Assistant
+        let isRec = false;
+        const SpeechEngine = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+
+        if (SpeechEngine) {
+            recognition = new SpeechEngine();
+            recognition.lang = 'hi-IN';
+            recognition.continuous = false;
+
+            recognition.onresult = function(e) {
+                const text = e.results[0][0].transcript;
+                document.getElementById('aiInput').value = text;
+                runSmartAI();
+            };
+
+            recognition.onend = function() {
+                isRec = false;
+                document.getElementById('voiceBtnText').innerText = "माइक";
+                document.getElementById('voiceMicIcon').className = "fa-solid fa-microphone text-rose-400";
+            };
+        }
+
+        function toggleVoiceAI() {
+            if (!recognition) {
+                alert("आपके ब्राउज़र में वॉइस रिकॉग्निशन सपोर्ट नहीं है। कृपया गूगल क्रोम का उपयोग करें।");
+                return;
+            }
+            if (!isRec) {
+                try {
+                    recognition.start();
+                    isRec = true;
+                    document.getElementById('voiceBtnText').innerText = "सुन रहा हूँ...";
+                    document.getElementById('voiceMicIcon').className = "fa-solid fa-microphone text-rose-400 animate-bounce";
+                } catch(e) { console.log(e); }
+            } else {
+                recognition.stop();
+            }
+        }
+
+        function readAloudAI() {
+            const text = document.getElementById('aiResContent').innerText;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = 'hi-IN';
+                utter.rate = 0.95;
+                window.speechSynthesis.speak(utter);
+            }
+        }
+
+        // Dosage Calculator
+        function recalcDosage() {
+            const form = document.getElementById('dosageFormula').value;
+            const unit = document.getElementById('dosageUnit').value;
+            let area = parseFloat(document.getElementById('dosageArea').value) || 1;
+
+            const acres = (unit === 'bigha') ? (area / 1.6) : area;
+            const out = document.getElementById('dosageOutput');
+
+            if (form === 'jeevamrit') {
+                out.innerHTML = `
+                    <strong>🌾 जीवामृत मात्रा (${area} ${unit === 'bigha' ? 'बीघा' : 'एकड़'} के लिए):</strong><br>
+                    • देसी गाय का गोबर: <strong>${(10 * acres).toFixed(1)} किग्रा</strong><br>
+                    • गोमूत्र: <strong>${(7 * acres).toFixed(1)} लीटर</strong><br>
+                    • गुड़: <strong>${(2 * acres).toFixed(1)} किग्रा</strong> | बेसन: <strong>${(2 * acres).toFixed(1)} किग्रा</strong><br>
+                    • पानी: <strong>${(200 * acres).toFixed(0)} लीटर</strong> + 1 मुट्ठी मेड़ की सजीव मिट्टी।<br>
+                    <span class="text-stone-500">विधि: 48 घंटे छाया में रखें और सिंचाई के पानी के साथ खेत में दें।</span>
+                `;
+            } else if (form === 'neemastra') {
+                out.innerHTML = `
+                    <strong>🛡️ नीमास्त्र मात्रा (${area} ${unit === 'bigha' ? 'बीघा' : 'एकड़'} के लिए):</strong><br>
+                    • नीम की पत्ती/निंबोली: <strong>${(5 * acres).toFixed(1)} किग्रा</strong><br>
+                    • गोमूत्र: <strong>${(5 * acres).toFixed(1)} लीटर</strong> | गोबर: <strong>${(2 * acres).toFixed(1)} किग्रा</strong><br>
+                    • पानी: <strong>${(100 * acres).toFixed(0)} लीटर</strong>। 48 घंटे बाद छानकर रस चूसने वाले कीटों पर स्प्रे करें।
+                `;
+            } else if (form === 'brahmastra') {
+                out.innerHTML = `
+                    <strong>⚡ ब्रह्मास्त्र (इल्ली व सुंडी नाशक):</strong><br>
+                    • नीम, सीताफल, धतूरा, करंज व आक (आकड़ा) के पत्तों को गोमूत्र में उबालें।<br>
+                    • स्प्रे मात्रा: <strong>30-40 मिली प्रति 15 लीटर पानी का पंप</strong>।
+                `;
+            } else if (form === 'buttermilk') {
+                out.innerHTML = `
+                    <strong>🥛 खट्टी छाछ + हींग (रतुआ व फफूंद नाशक):</strong><br>
+                    • पुरानी खट्टी छाछ: <strong>${(5 * acres).toFixed(1)} लीटर</strong><br>
+                    • असली हींग: <strong>${(100 * acres).toFixed(0)} ग्राम</strong><br>
+                    • पानी: <strong>${(100 * acres).toFixed(0)} लीटर</strong> में घोलकर पत्तियों पर छिड़कें।
+                `;
+            }
+        }
+
+        // Email Queue & Offline Sync System
+        function getQueue() {
+            return JSON.parse(localStorage.getItem('kisan_queries_queue') || '[]');
+        }
+
+        function refreshCounter() {
+            document.getElementById('queueCounter').innerText = getQueue().length;
+        }
+
+        function handleInquirySubmit(e) {
+            e.preventDefault();
+            const ticket = {
+                id: Date.now(),
+                name: document.getElementById('inqName').value.trim(),
+                phone: document.getElementById('inqPhone').value.trim(),
+                crop: document.getElementById('inqCrop').value.trim(),
+                soil: document.getElementById('inqSoil').value,
+                problem: document.getElementById('inqMessage').value.trim(),
+                date: new Date().toLocaleString('hi-IN')
+            };
+
+            const q = getQueue();
+            q.push(ticket);
+            localStorage.setItem('kisan_queries_queue', JSON.stringify(q));
+            refreshCounter();
+
+            document.getElementById('inqMessage').value = "";
+            alert("सवाल फोन में सुरक्षित सेव हो गया है!");
+
+            if (navigator.onLine) {
+                syncEmailQueue();
+            } else {
+                alert("नेटवर्क न होने के कारण सवाल ऑफलाइन कतार में है। गांव में नेटवर्क आते ही 'अभी ईमेल सिंक करें' दबाएं।");
+            }
+        }
+
+        function syncEmailQueue() {
+            const q = getQueue();
+            if (q.length === 0) {
+                alert("कोई भी लंबित सवाल नहीं है। सभी सवाल पहले से सिंक हैं!");
+                return;
+            }
+
+            const item = q[q.length - 1];
+            const subj = encodeURIComponent(`[किसान सहायता] ${item.crop} - ${item.name}`);
+            const body = encodeURIComponent(
+                `प्रणाम कृषि विशेषज्ञ टीम,\n\n` +
+                `किसान विवरण:\n` +
+                `• नाम व क्षेत्र: ${item.name}\n` +
+                `• संपर्क नंबर: ${item.phone}\n` +
+                `• फसल: ${item.crop}\n` +
+                `• मिट्टी: ${item.soil}\n` +
+                `• दर्ज समय: ${item.date}\n\n` +
+                `समस्या / सवाल:\n${item.problem}\n\n` +
+                `---\nकिसान AI ग्राम-साथी ऐप द्वारा प्रेषित`
+            );
+
+            window.location.href = `mailto:${EMAIL_TARGET}?subject=${subj}&body=${body}`;
+            localStorage.setItem('kisan_queries_queue', JSON.stringify([]));
+            refreshCounter();
+        }
+
+        // Network Monitor
+        function checkNetwork() {
+            const online = navigator.onLine;
+            const badge = document.getElementById('netStatusBadge');
+            const dot = document.getElementById('netStatusDot');
+            const txt = document.getElementById('netStatusText');
+            const notice = document.getElementById('offlineNotice');
+
+            if (online) {
+                badge.className = "flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 border border-emerald-400 shadow";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-lime-300";
+                txt.innerText = "ऑनलाइन AI";
+                notice.classList.add('hidden');
+                syncEmailQueue();
+            } else {
+                badge.className = "flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-600 border border-amber-300 pulse-offline";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-white";
+                txt.innerText = "गांव मोड (ऑफलाइन)";
+                notice.classList.remove('hidden');
+            }
+        }
+
+        window.addEventListener('online', checkNetwork);
+        window.addEventListener('offline', checkNetwork);
+
+        // App Init
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCrops(CROPS);
+            recalcDosage();
+            refreshCounter();
+            checkNetwork();
+        });
+    </script>
+</body>
+</html>
